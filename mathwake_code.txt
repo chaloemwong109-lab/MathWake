@@ -1,0 +1,1248 @@
+﻿=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\build.gradle.kts ===
+plugins {
+    alias(libs.plugins.android.application)
+    id("org.jetbrains.kotlin.plugin.compose")
+    id("com.google.devtools.ksp")
+}
+
+android {
+    namespace = "com.example.mathwake"
+    compileSdk = 35
+
+    defaultConfig {
+        applicationId = "com.example.mathwake"
+        minSdk = 28
+        targetSdk = 35
+        versionCode = 1
+        versionName = "1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+    buildFeatures {
+        compose = true
+    }
+}
+
+dependencies {
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
+    implementation(libs.material)
+    implementation(libs.androidx.navigation.compose)
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.manifest)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\gradle\libs.versions.toml ===
+[versions]
+agp = "9.3.3"
+kotlin = "2.0.21"
+coreKtx = "1.15.0"
+junit = "4.13.2"
+junitVersion = "1.3.0"
+espressoCore = "3.7.0"
+appcompat = "1.8.0"
+material = "1.14.0"
+activityKtx = "1.10.0"
+constraintlayout = "2.2.2"
+lifecycleRuntimeKtx = "2.8.7"
+activityCompose = "1.10.0"
+composeBom = "2025.01.01"
+navigationCompose = "2.8.6"
+room = "2.8.5"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
+constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version = "2.0.21-1.0.28" }
+
+
+
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\java\com\example\mathwake\alarm\AlarmReceiver.kt ===
+package com.example.mathwake.alarm
+
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+
+class AlarmReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
+            // Need to reschedule all active alarms
+            return
+        }
+
+        val alarmId = intent.getIntExtra("ALARM_ID", -1)
+        val difficulty = intent.getStringExtra("DIFFICULTY") ?: "EASY"
+        
+        if (alarmId != -1) {
+            val serviceIntent = Intent(context, AlarmService::class.java).apply {
+                putExtra("ALARM_ID", alarmId)
+                putExtra("DIFFICULTY", difficulty)
+            }
+            
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(serviceIntent)
+            } else {
+                context.startService(serviceIntent)
+            }
+        }
+    }
+}
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\java\com\example\mathwake\alarm\AlarmScheduler.kt ===
+package com.example.mathwake.alarm
+
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import com.example.mathwake.data.Alarm
+import java.util.Calendar
+
+class AlarmScheduler(private val context: Context) {
+
+    private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+    fun schedule(alarm: Alarm) {
+        if (!alarm.isActive) return
+
+        val intent = Intent(context, AlarmReceiver::class.java).apply {
+            putExtra("ALARM_ID", alarm.id)
+            putExtra("DIFFICULTY", alarm.difficulty.name)
+        }
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            alarm.id,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, alarm.hour)
+            set(Calendar.MINUTE, alarm.minute)
+            set(Calendar.SECOND, 0)
+            
+            // If the time is in the past, schedule for tomorrow
+            if (before(Calendar.getInstance())) {
+                add(Calendar.DATE, 1)
+            }
+        }
+
+        try {
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                calendar.timeInMillis,
+                pendingIntent
+            )
+        } catch (e: SecurityException) {
+            // Need to handle missing EXACT_ALARM permission
+            e.printStackTrace()
+        }
+    }
+
+    fun cancel(alarm: Alarm) {
+        val intent = Intent(context, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            alarm.id,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager.cancel(pendingIntent)
+    }
+}
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\java\com\example\mathwake\alarm\AlarmService.kt ===
+package com.example.mathwake.alarm
+
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
+import android.content.Context
+import android.content.Intent
+import android.media.RingtoneManager
+import android.os.IBinder
+import androidx.core.app.NotificationCompat
+import com.example.mathwake.MainActivity
+
+class AlarmService : Service() {
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val alarmId = intent?.getIntExtra("ALARM_ID", -1) ?: -1
+        val difficulty = intent?.getStringExtra("DIFFICULTY") ?: "EASY"
+
+        createNotificationChannel()
+
+        val fullScreenIntent = Intent(this, MainActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            putExtra("IS_RINGING", true)
+            putExtra("ALARM_ID", alarmId)
+            putExtra("DIFFICULTY", difficulty)
+        }
+
+        val fullScreenPendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            fullScreenIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("MathWake Alarm")
+            .setContentText("Time to wake up!")
+            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setFullScreenIntent(fullScreenPendingIntent, true)
+            .setOngoing(true)
+            .build()
+
+        startForeground(1, notification)
+
+        // For ringing sound, we could use MediaPlayer with a loop
+        // In a real app, we handle the MediaPlayer instance here
+        playAlarmSound()
+
+        return START_STICKY
+    }
+
+    private fun playAlarmSound() {
+        val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+        val ringtone = RingtoneManager.getRingtone(this, alarmUri)
+        ringtone?.play()
+        // Note: For a robust alarm, a foreground service managing a MediaPlayer on loop is better.
+        // We'll keep it simple with RingtoneManager for now.
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
+    }
+
+    private fun createNotificationChannel() {
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            "Alarm Channel",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Channel for Alarm notifications"
+        }
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+    }
+
+    companion object {
+        private const val CHANNEL_ID = "MATHWAKE_ALARM_CHANNEL"
+    }
+}
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\java\com\example\mathwake\data\Alarm.kt ===
+package com.example.mathwake.data
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "alarms")
+data class Alarm(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val hour: Int,
+    val minute: Int,
+    val isActive: Boolean = true,
+    val difficulty: MathDifficulty = MathDifficulty.EASY,
+    val repeatDays: String = "" // e.g. "1,2,3,4,5" for Mon-Fri
+)
+
+enum class MathDifficulty {
+    EASY, MEDIUM, HARD
+}
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\java\com\example\mathwake\data\AlarmDao.kt ===
+package com.example.mathwake.data
+
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface AlarmDao {
+    @Query("SELECT * FROM alarms ORDER BY hour ASC, minute ASC")
+    fun getAllAlarms(): Flow<List<Alarm>>
+
+    @Query("SELECT * FROM alarms WHERE id = :id")
+    suspend fun getAlarmById(id: Int): Alarm?
+
+    @Insert
+    suspend fun insertAlarm(alarm: Alarm): Long
+
+    @Update
+    suspend fun updateAlarm(alarm: Alarm)
+
+    @Delete
+    suspend fun deleteAlarm(alarm: Alarm)
+}
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\java\com\example\mathwake\data\AlarmDatabase.kt ===
+package com.example.mathwake.data
+
+import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+
+@Database(entities = [Alarm::class], version = 1, exportSchema = false)
+abstract class AlarmDatabase : RoomDatabase() {
+    abstract fun alarmDao(): AlarmDao
+
+    companion object {
+        @Volatile
+        private var INSTANCE: AlarmDatabase? = null
+
+        fun getDatabase(context: Context): AlarmDatabase {
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    AlarmDatabase::class.java,
+                    "alarm_database"
+                ).build()
+                INSTANCE = instance
+                instance
+            }
+        }
+    }
+}
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\java\com\example\mathwake\logic\MathProblemGenerator.kt ===
+package com.example.mathwake.logic
+
+import com.example.mathwake.data.MathDifficulty
+import kotlin.random.Random
+
+data class MathProblem(
+    val question: String,
+    val answer: Int
+)
+
+object MathProblemGenerator {
+    fun generateProblem(difficulty: MathDifficulty): MathProblem {
+        return when (difficulty) {
+            MathDifficulty.EASY -> generateEasy()
+            MathDifficulty.MEDIUM -> generateMedium()
+            MathDifficulty.HARD -> generateHard()
+        }
+    }
+
+    private fun generateEasy(): MathProblem {
+        // 1-digit addition or subtraction (positive answer)
+        val isAddition = Random.nextBoolean()
+        val a = Random.nextInt(1, 10)
+        val b = Random.nextInt(1, 10)
+        
+        return if (isAddition) {
+            MathProblem("$a + $b = ?", a + b)
+        } else {
+            val max = maxOf(a, b)
+            val min = minOf(a, b)
+            MathProblem("$max - $min = ?", max - min)
+        }
+    }
+
+    private fun generateMedium(): MathProblem {
+        // 2-digit addition or subtraction
+        val isAddition = Random.nextBoolean()
+        val a = Random.nextInt(10, 100)
+        val b = Random.nextInt(10, 100)
+
+        return if (isAddition) {
+            MathProblem("$a + $b = ?", a + b)
+        } else {
+            val max = maxOf(a, b)
+            val min = minOf(a, b)
+            MathProblem("$max - $min = ?", max - min)
+        }
+    }
+
+    private fun generateHard(): MathProblem {
+        // Mixed: 2-digit multiplication, division (whole numbers) or complex addition
+        val op = Random.nextInt(0, 3)
+        return when (op) {
+            0 -> { // Multiplication 1-digit by 2-digit
+                val a = Random.nextInt(2, 10)
+                val b = Random.nextInt(11, 30)
+                MathProblem("$a × $b = ?", a * b)
+            }
+            1 -> { // Division (ensure whole number)
+                val b = Random.nextInt(2, 15)
+                val answer = Random.nextInt(5, 20)
+                val a = answer * b
+                MathProblem("$a ÷ $b = ?", answer)
+            }
+            else -> { // Complex addition 3 items
+                val a = Random.nextInt(10, 50)
+                val b = Random.nextInt(10, 50)
+                val c = Random.nextInt(10, 50)
+                MathProblem("$a + $b + $c = ?", a + b + c)
+            }
+        }
+    }
+}
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\java\com\example\mathwake\ui\screens\AddEditAlarmScreen.kt ===
+package com.example.mathwake.ui.screens
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.example.mathwake.R
+
+@Composable
+fun AddEditAlarmScreen(
+    alarmId: Int?,
+    onNavigateBack: () -> Unit
+) {
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text(stringResource(R.string.delete_confirm_title)) },
+            text = { Text(stringResource(R.string.delete_confirm_desc)) },
+            confirmButton = {
+                TextButton(onClick = { 
+                    showDeleteDialog = false
+                    // TODO: Delete from DB
+                    onNavigateBack()
+                }) {
+                    Text(stringResource(R.string.delete_confirm_yes))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(stringResource(if (alarmId == null) R.string.add_alarm_title else R.string.edit_alarm_title))
+            
+            Button(onClick = onNavigateBack) {
+                Text(stringResource(R.string.save))
+            }
+
+            if (alarmId != null) {
+                Button(onClick = { showDeleteDialog = true }) {
+                    Text(stringResource(R.string.delete))
+                }
+            }
+        }
+    }
+}
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\java\com\example\mathwake\ui\screens\AlarmListScreen.kt ===
+package com.example.mathwake.ui.screens
+
+import android.app.Activity
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.example.mathwake.R
+
+@Composable
+fun AlarmListScreen(
+    onNavigateToAdd: () -> Unit,
+    onNavigateToEdit: (Int) -> Unit
+) {
+    var showExitDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current as? Activity
+
+    BackHandler {
+        showExitDialog = true
+    }
+
+    if (showExitDialog) {
+        AlertDialog(
+            onDismissRequest = { showExitDialog = false },
+            title = { Text(stringResource(R.string.exit_confirm_title)) },
+            text = { Text(stringResource(R.string.exit_confirm_desc)) },
+            confirmButton = {
+                TextButton(onClick = { 
+                    showExitDialog = false
+                    context?.finish()
+                }) {
+                    Text(stringResource(R.string.exit_confirm_yes))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showExitDialog = false }) {
+                    Text(stringResource(R.string.exit_confirm_no))
+                }
+            }
+        )
+    }
+
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = onNavigateToAdd) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(R.string.add_alarm_btn)
+                )
+            }
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(stringResource(R.string.no_alarm_desc))
+        }
+    }
+}
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\java\com\example\mathwake\ui\screens\AlarmRingingScreen.kt ===
+package com.example.mathwake.ui.screens
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.example.mathwake.R
+import com.example.mathwake.data.MathDifficulty
+import com.example.mathwake.logic.MathProblem
+import com.example.mathwake.logic.MathProblemGenerator
+
+@Composable
+fun AlarmRingingScreen(
+    alarmId: Int,
+    difficulty: MathDifficulty,
+    onAlarmDismissed: () -> Unit
+) {
+    // Prevent accidental back press during alarm ringing
+    BackHandler {
+        // Do nothing, force user to solve math
+    }
+
+    var problem by remember { mutableStateOf<MathProblem?>(null) }
+    // rememberSaveable to keep state when rotating or switching apps
+    var currentAnswer by rememberSaveable { mutableStateOf("") }
+    var isError by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(difficulty) {
+        if (problem == null) {
+            problem = MathProblemGenerator.generateProblem(difficulty)
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(stringResource(R.string.wake_up_message))
+            
+            problem?.let { p ->
+                Text(p.question)
+                // In a real app, this would be a custom Numpad. 
+                // For simplicity in structure, just a button to simulate correct answer
+                Text("Current input: $currentAnswer")
+
+                if (isError) {
+                    Text(stringResource(R.string.incorrect_answer), color = androidx.compose.ui.graphics.Color.Red)
+                }
+
+                Button(onClick = { 
+                    if (currentAnswer == p.answer.toString()) {
+                        onAlarmDismissed()
+                    } else {
+                        // Simulate error
+                        isError = true
+                    }
+                }) {
+                    Text(stringResource(R.string.submit_answer))
+                }
+                
+                // Cheat button for testing
+                Button(onClick = { currentAnswer = p.answer.toString() }) {
+                    Text("Cheat (Set correct answer)")
+                }
+            }
+        }
+    }
+}
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\java\com\example\mathwake\ui\theme\Color.kt ===
+package com.example.mathwake.ui.theme
+
+import androidx.compose.ui.graphics.Color
+
+val OrangePrimary = Color(0xFFFF9800)
+val OrangeVariant = Color(0xFFF57C00)
+val GreenSuccess = Color(0xFF4CAF50)
+val RedError = Color(0xFFF44336)
+val BlueAction = Color(0xFF2196F3)
+
+val LightBackground = Color(0xFFFFF8E7)
+val LightSurface = Color(0xFFFFFFFF)
+val LightText = Color(0xFF212121)
+
+val DarkBackground = Color(0xFF1E1E2C)
+val DarkSurface = Color(0xFF2D2D44)
+val DarkText = Color(0xFFFFFFFF)
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\java\com\example\mathwake\ui\theme\Theme.kt ===
+package com.example.mathwake.ui.theme
+
+import android.app.Activity
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
+
+private val DarkColorScheme = darkColorScheme(
+    primary = OrangePrimary,
+    secondary = OrangeVariant,
+    background = DarkBackground,
+    surface = DarkSurface,
+    onPrimary = DarkText,
+    onSecondary = DarkText,
+    onBackground = DarkText,
+    onSurface = DarkText
+)
+
+private val LightColorScheme = lightColorScheme(
+    primary = OrangePrimary,
+    secondary = OrangeVariant,
+    background = LightBackground,
+    surface = LightSurface,
+    onPrimary = LightSurface,
+    onSecondary = LightSurface,
+    onBackground = LightText,
+    onSurface = LightText
+)
+
+@Composable
+fun MathWakeTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = colorScheme.background.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+        }
+    }
+
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = Typography,
+        content = content
+    )
+}
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\java\com\example\mathwake\ui\theme\Type.kt ===
+package com.example.mathwake.ui.theme
+
+import androidx.compose.material3.Typography
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+
+// Set of Material typography styles to start with
+val Typography = Typography(
+    bodyLarge = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.5.sp
+    )
+)
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\java\com\example\mathwake\MainActivity.kt ===
+package com.example.mathwake
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Scaffold
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.mathwake.data.MathDifficulty
+import com.example.mathwake.ui.screens.AddEditAlarmScreen
+import com.example.mathwake.ui.screens.AlarmListScreen
+import com.example.mathwake.ui.screens.AlarmRingingScreen
+import com.example.mathwake.ui.theme.MathWakeTheme
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        
+        val isRinging = intent.getBooleanExtra("IS_RINGING", false)
+        val ringingAlarmId = intent.getIntExtra("ALARM_ID", -1)
+        val ringingDifficulty = intent.getStringExtra("DIFFICULTY") ?: "EASY"
+        
+        setContent {
+            MathWakeTheme {
+                val navController = rememberNavController()
+                
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    NavHost(
+                        navController = navController, 
+                        startDestination = if (isRinging) "ringing" else "list"
+                    ) {
+                        composable("list") {
+                            AlarmListScreen(
+                                onNavigateToAdd = { navController.navigate("add_edit/-1") },
+                                onNavigateToEdit = { id -> navController.navigate("add_edit/$id") }
+                            )
+                        }
+                        
+                        composable(
+                            "add_edit/{alarmId}",
+                            arguments = listOf(navArgument("alarmId") { type = NavType.IntType })
+                        ) { backStackEntry ->
+                            val alarmId = backStackEntry.arguments?.getInt("alarmId")
+                            AddEditAlarmScreen(
+                                alarmId = if (alarmId == -1) null else alarmId,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        
+                        composable("ringing") {
+                            AlarmRingingScreen(
+                                alarmId = ringingAlarmId,
+                                difficulty = MathDifficulty.valueOf(ringingDifficulty),
+                                onAlarmDismissed = { finish() }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\res\drawable\ic_launcher_background.xml ===
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#3DDC84"
+        android:pathData="M0,0h108v108h-108z" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M9,0L9,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M19,0L19,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M29,0L29,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M39,0L39,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M49,0L49,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M59,0L59,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M69,0L69,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M79,0L79,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M89,0L89,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M99,0L99,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,9L108,9"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,19L108,19"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,29L108,29"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,39L108,39"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,49L108,49"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,59L108,59"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,69L108,69"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,79L108,79"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,89L108,89"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,99L108,99"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M19,29L89,29"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M19,39L89,39"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M19,49L89,49"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M19,59L89,59"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M19,69L89,69"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M19,79L89,79"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M29,19L29,89"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M39,19L39,89"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M49,19L49,89"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M59,19L59,89"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M69,19L69,89"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M79,19L79,89"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+</vector>
+
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\res\drawable\ic_launcher_foreground.xml ===
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:pathData="M31,63.928c0,0 6.4,-11 12.1,-13.1c7.2,-2.6 26,-1.4 26,-1.4l38.1,38.1L107,108.928l-32,-1L31,63.928z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:endX="85.84757"
+                android:endY="92.4963"
+                android:startX="42.9492"
+                android:startY="49.59793"
+                android:type="linear">
+                <item
+                    android:color="#44000000"
+                    android:offset="0.0" />
+                <item
+                    android:color="#00000000"
+                    android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="nonZero"
+        android:pathData="M65.3,45.828l3.8,-6.6c0.2,-0.4 0.1,-0.9 -0.3,-1.1c-0.4,-0.2 -0.9,-0.1 -1.1,0.3l-3.9,6.7c-6.3,-2.8 -13.4,-2.8 -19.7,0l-3.9,-6.7c-0.2,-0.4 -0.7,-0.5 -1.1,-0.3C38.8,38.328 38.7,38.828 38.9,39.228l3.8,6.6C36.2,49.428 31.7,56.028 31,63.928h46C76.3,56.028 71.8,49.428 65.3,45.828zM43.4,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2c-0.3,-0.7 -0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C45.3,56.528 44.5,57.328 43.4,57.328L43.4,57.328zM64.6,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2s-0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C66.5,56.528 65.6,57.328 64.6,57.328L64.6,57.328z"
+        android:strokeWidth="1"
+        android:strokeColor="#00000000" />
+</vector>
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\res\mipmap-anydpi\ic_launcher.xml ===
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_launcher_background" />
+    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+    <monochrome android:drawable="@drawable/ic_launcher_foreground" />
+</adaptive-icon>
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\res\mipmap-anydpi\ic_launcher_round.xml ===
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_launcher_background" />
+    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+    <monochrome android:drawable="@drawable/ic_launcher_foreground" />
+</adaptive-icon>
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\res\values\colors.xml ===
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- We'll use Compose colors instead, but keeping a few for standard android system UI if needed -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="primary">#FFAA33</color>
+</resources>
+
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\res\values\strings.xml ===
+<resources>
+    <string name="app_name">MathWake</string>
+    <string name="alarm_list_title">Alarm Clock</string>
+    <string name="no_alarm_desc">No alarms yet. Add one to get started!</string>
+    <string name="add_alarm_btn">Add Alarm</string>
+    <string name="edit_alarm_title">Edit Alarm</string>
+    <string name="add_alarm_title">Add Alarm</string>
+    <string name="math_difficulty">Math Difficulty</string>
+    <string name="easy">Easy</string>
+    <string name="easy_desc">1-Digit</string>
+    <string name="medium">Medium</string>
+    <string name="medium_desc">2-Digit</string>
+    <string name="hard">Hard</string>
+    <string name="hard_desc">Mixed</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete_confirm_title">Delete Alarm?</string>
+    <string name="delete_confirm_desc">Are you sure you want to delete this alarm?</string>
+    <string name="delete_confirm_yes">Yes, Delete</string>
+    <string name="exit_confirm_title">Exit MathWake?</string>
+    <string name="exit_confirm_desc">Are you sure you want to exit?</string>
+    <string name="exit_confirm_yes">Exit</string>
+    <string name="exit_confirm_no">Stay</string>
+    <string name="correct_answer">Correct!</string>
+    <string name="incorrect_answer">Incorrect, try again</string>
+    <string name="wake_up_message">Good morning! Time to wake up.</string>
+    <string name="enter_answer">Enter answer</string>
+    <string name="submit_answer">Submit Answer</string>
+</resources>
+
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\res\values\themes.xml ===
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.MathWake" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme.MathWake" parent="Base.Theme.MathWake" />
+</resources>
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\res\values-night\themes.xml ===
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.MathWake" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your dark theme here. -->
+        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+    </style>
+</resources>
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\res\values-th\strings.xml ===
+<resources>
+    <string name="app_name">MathWake</string>
+    <string name="alarm_list_title">นาฬิกาปลุก</string>
+    <string name="no_alarm_desc">ยังไม่มีนาฬิกาปลุก\nเพิ่มเพื่อเริ่มต้นใช้งาน!</string>
+    <string name="add_alarm_btn">เพิ่มนาฬิกาปลุก</string>
+    <string name="edit_alarm_title">แก้ไขนาฬิกาปลุก</string>
+    <string name="add_alarm_title">เพิ่มนาฬิกาปลุก</string>
+    <string name="math_difficulty">ระดับความยากคณิตศาสตร์</string>
+    <string name="easy">ง่าย</string>
+    <string name="easy_desc">เลข 1 หลัก</string>
+    <string name="medium">ปานกลาง</string>
+    <string name="medium_desc">เลข 2 หลัก</string>
+    <string name="hard">ยาก</string>
+    <string name="hard_desc">คละแบบ</string>
+    <string name="save">บันทึก</string>
+    <string name="delete">ลบ</string>
+    <string name="cancel">ยกเลิก</string>
+    <string name="delete_confirm_title">ลบนาฬิกาปลุก?</string>
+    <string name="delete_confirm_desc">คุณแน่ใจหรือไม่ว่าต้องการลบนาฬิกาปลุกนี้?</string>
+    <string name="delete_confirm_yes">ใช่, ลบเลย</string>
+    <string name="exit_confirm_title">ออกจาก MathWake?</string>
+    <string name="exit_confirm_desc">คุณแน่ใจหรือไม่ว่าต้องการออกจากแอป?</string>
+    <string name="exit_confirm_yes">ออก</string>
+    <string name="exit_confirm_no">อยู่ต่อ</string>
+    <string name="correct_answer">ถูกต้อง!</string>
+    <string name="incorrect_answer">ผิดพลาด, ลองอีกครั้ง</string>
+    <string name="wake_up_message">เก่งมาก!\nตื่นได้แล้ว</string>
+    <string name="enter_answer">ใส่คำตอบ</string>
+    <string name="submit_answer">ยืนยันคำตอบ</string>
+</resources>
+
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\res\xml\backup_rules.xml ===
+<?xml version="1.0" encoding="utf-8"?><!--
+   Sample backup rules file; uncomment and customize as necessary.
+   See https://developer.android.com/guide/topics/data/autobackup
+   for details.
+   Note: This file is ignored for devices older than API 31
+   See https://developer.android.com/about/versions/12/backup-restore
+-->
+<full-backup-content>
+    <!--
+   <include domain="sharedpref" path="."/>
+   <exclude domain="sharedpref" path="device.xml"/>
+-->
+</full-backup-content>
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\res\xml\data_extraction_rules.xml ===
+<?xml version="1.0" encoding="utf-8"?><!--
+   Sample data extraction rules file; uncomment and customize as necessary.
+   See https://developer.android.com/about/versions/12/backup-restore#xml-changes
+   for details.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- TODO: Use <include> and <exclude> to control what is backed up.
+        <include .../>
+        <exclude .../>
+        -->
+    </cloud-backup>
+    <!--
+    <device-transfer>
+        <include .../>
+        <exclude .../>
+    </device-transfer>
+    -->
+</data-extraction-rules>
+
+=== C:\Users\Asus\AndroidStudioProjects\MathWake\app\src\main\AndroidManifest.xml ===
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MathWake">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <service
+            android:name=".alarm.AlarmService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <receiver
+            android:name=".alarm.AlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>
+
