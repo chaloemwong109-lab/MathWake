@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">MathWake</string>
+    <string name="alarm_list_title">นาฬิกาปลุก</string>
+    <string name="no_alarm_desc">ยังไม่มีนาฬิกาปลุก\nเพิ่มเพื่อเริ่มต้นใช้งาน!</string>
+    <string name="add_alarm_btn">เพิ่มนาฬิกาปลุก</string>
+    <string name="edit_alarm_title">แก้ไขนาฬิกาปลุก</string>
+    <string name="add_alarm_title">เพิ่มนาฬิกาปลุก</string>
+    <string name="math_difficulty">ระดับความยากคณิตศาสตร์</string>
+    <string name="easy">ง่าย</string>
+    <string name="easy_desc">เลข 1 หลัก</string>
+    <string name="medium">ปานกลาง</string>
+    <string name="medium_desc">เลข 2 หลัก</string>
+    <string name="hard">ยาก</string>
+    <string name="hard_desc">คละแบบ</string>
+    <string name="save">บันทึก</string>
+    <string name="delete">ลบ</string>
+    <string name="cancel">ยกเลิก</string>
+    <string name="delete_confirm_title">ลบนาฬิกาปลุก?</string>
+    <string name="delete_confirm_desc">คุณแน่ใจหรือไม่ว่าต้องการลบนาฬิกาปลุกนี้?</string>
+    <string name="delete_confirm_yes">ใช่, ลบเลย</string>
+    <string name="exit_confirm_title">ออกจาก MathWake?</string>
+    <string name="exit_confirm_desc">คุณแน่ใจหรือไม่ว่าต้องการออกจากแอป?</string>
+    <string name="exit_confirm_yes">ออก</string>
+    <string name="exit_confirm_no">อยู่ต่อ</string>
+    <string name="correct_answer">ถูกต้อง!</string>
+    <string name="incorrect_answer">ผิดพลาด, ลองอีกครั้ง</string>
+    <string name="wake_up_message">เก่งมาก!\nตื่นได้แล้ว</string>
+    <string name="enter_answer">ใส่คำตอบ</string>
+    <string name="submit_answer">ยืนยันคำตอบ</string>
+</resources>
