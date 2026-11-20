@@ -9,9 +9,10 @@ data class Alarm(
     val id: Int = 0,
     val hour: Int,
     val minute: Int,
+    val label: String = "",
     val isActive: Boolean = true,
     val difficulty: MathDifficulty = MathDifficulty.EASY,
-    val repeatDays: String = "" // e.g. "1,2,3,4,5" for Mon-Fri
+    val repeatDays: String = ""
 )
 
 enum class MathDifficulty {

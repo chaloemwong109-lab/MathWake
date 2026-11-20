@@ -27,4 +27,10 @@
     <string name="wake_up_message">เก่งมาก!\nตื่นได้แล้ว</string>
     <string name="enter_answer">ใส่คำตอบ</string>
     <string name="submit_answer">ยืนยันคำตอบ</string>
+    <string name="permission_overlay_title">อนุญาตให้แสดงทับแอปอื่น</string>
+    <string name="permission_overlay_desc">เพื่อให้หน้าโจทย์คณิตศาสตร์เด้งขึ้นมาปลุกได้ทันที ไม่ว่าคุณจะเปิดใช้งานแอปอื่นอยู่ก็ตาม\n\nวิธีตั้งค่า:\n1. กด \"ไปที่การตั้งค่า\"\n2. แตะเลือก \"MathWake\"\n3. เปิดสวิตช์อนุญาตแล้วกดย้อนกลับ</string>
+    <string name="permission_fullscreen_title">อนุญาตการแจ้งเตือนเต็มหน้าจอ</string>
+    <string name="permission_fullscreen_desc">เพื่อให้หน้าโจทย์คณิตศาสตร์เด้งขึ้นมาปลุกได้แม้ในขณะที่หน้าจอล็อกอยู่\n\nกด \"ไปที่การตั้งค่า\" แล้วเปิดสวิตช์อนุญาต</string>
+    <string name="permission_go_to_settings">ไปที่การตั้งค่า</string>
+    <string name="permission_later">ไว้ทีหลัง</string>
 </resources>

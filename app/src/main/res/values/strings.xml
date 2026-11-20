@@ -1,30 +1,75 @@
 <resources>
     <string name="app_name">MathWake</string>
+    <string name="greeting">Good Morning</string>
     <string name="alarm_list_title">Alarm Clock</string>
-    <string name="no_alarm_desc">No alarms yet. Add one to get started!</string>
+    <string name="my_alarms_section">My Alarms</string>
+    <string name="alarm_count">%1$d alarms</string>
+    <string name="default_alarm_label">Alarm</string>
+
+    <string name="no_alarm_title">No Alarms Yet</string>
+    <string name="no_alarm_desc">Add your first alarm to train your brain every morning.</string>
     <string name="add_alarm_btn">Add Alarm</string>
     <string name="edit_alarm_title">Edit Alarm</string>
     <string name="add_alarm_title">Add Alarm</string>
+    <string name="back_cd">Back</string>
+    <string name="clear_cd">Clear</string>
+    <string name="test_alarm_cd">Test Alarm</string>
+
+    <string name="set_time_label">Set Time</string>
+    <string name="alarm_label_section">Alarm Label</string>
+    <string name="alarm_label_hint">Enter alarm label</string>
     <string name="math_difficulty">Math Difficulty</string>
+
     <string name="easy">Easy</string>
-    <string name="easy_desc">1-Digit</string>
+    <string name="easy_example">5 + 3</string>
+    <string name="easy_desc">1-digit add/sub</string>
     <string name="medium">Medium</string>
-    <string name="medium_desc">2-Digit</string>
+    <string name="medium_example">24 + 18</string>
+    <string name="medium_desc">2-digit add/sub</string>
     <string name="hard">Hard</string>
-    <string name="hard_desc">Mixed</string>
+    <string name="hard_example">12 × 8</string>
+    <string name="hard_desc">Mul, div &amp; mix</string>
+
     <string name="save">Save</string>
     <string name="delete">Delete</string>
+    <string name="delete_alarm_btn">Delete Alarm</string>
     <string name="cancel">Cancel</string>
-    <string name="delete_confirm_title">Delete Alarm?</string>
-    <string name="delete_confirm_desc">Are you sure you want to delete this alarm?</string>
-    <string name="delete_confirm_yes">Yes, Delete</string>
+
+    <string name="delete_confirm_title">Delete this alarm?</string>
+    <string name="delete_confirm_desc">\"%1$s\" will be permanently removed from your list.</string>
+    <string name="delete_confirm_yes">Delete</string>
+
     <string name="exit_confirm_title">Exit MathWake?</string>
-    <string name="exit_confirm_desc">Are you sure you want to exit?</string>
+    <string name="exit_confirm_desc">Are you sure you want to exit the app?</string>
     <string name="exit_confirm_yes">Exit</string>
     <string name="exit_confirm_no">Stay</string>
-    <string name="correct_answer">Correct!</string>
-    <string name="incorrect_answer">Incorrect, try again</string>
-    <string name="wake_up_message">Good morning! Time to wake up.</string>
+
+    <string name="ringing_badge">Alarm Ringing</string>
+    <string name="wake_brain_title">Wake Up Your Brain!</string>
+    <string name="solve_to_dismiss">Solve the math problem to stop the alarm</string>
     <string name="enter_answer">Enter answer</string>
     <string name="submit_answer">Submit Answer</string>
+    <string name="ringing_footer_hint">Answer correctly to turn off the alarm</string>
+    <string name="incorrect_answer_title">Incorrect Answer</string>
+    <string name="incorrect_answer_desc">Give it another try!</string>
+
+    <string name="mission_complete_badge">MISSION COMPLETE</string>
+    <string name="wake_up_message">Great Job!\nTime to Wake Up</string>
+    <string name="wake_up_subtitle">Start your morning with a fresh, sharp mind.</string>
+    <string name="summary_problem">Problem</string>
+    <string name="summary_your_answer">Your Answer</string>
+    <string name="done_btn">Done</string>
+
+    <string name="notification_channel_name">MathWake Alarms</string>
+    <string name="notification_channel_desc">Notifications for active MathWake alarms</string>
+    <string name="notification_alarm_title">MathWake Alarm</string>
+    <string name="notification_alarm_desc">Time to wake up and solve your math challenge!</string>
+
+    <string name="permission_overlay_title">Allow Display Over Other Apps</string>
+    <string name="permission_overlay_desc">So the math alarm can pop up immediately even while using other apps.\n\nHow to enable:\n1. Tap \"Go to Settings\"\n2. Select \"MathWake\"\n3. Turn on the switch and press Back</string>
+    <string name="permission_fullscreen_title">Allow Full-Screen Alarms</string>
+    <string name="permission_fullscreen_desc">So the math alarm can wake up the screen automatically even when your phone is locked.\n\nTap \"Go to Settings\" and turn on the switch.</string>
+    <string name="permission_go_to_settings">Go to Settings</string>
+    <string name="permission_later">Later</string>
+
 </resources>
